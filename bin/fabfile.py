@@ -2,7 +2,8 @@ from __future__ import with_statement
 
 # Import the fabtools module by adding it to the beginning of the path
 import sys
-sys.path[:0] = ["."]
+sys.path[:0] = ["./"]
+print(os.getcwd())
 import config
 import git
 import pear
@@ -11,7 +12,7 @@ import tools
 
 from fabric.api import *
 from fabric.contrib.files import *
-from sys import exit
+#from sys import exit
 from datetime import date, timedelta
 from fabric.contrib.console import confirm
 from fabric.colors import red, green
