@@ -1,14 +1,14 @@
 {
     "name": "hgg/sfdeploy",
     "description": "Fabric deployment for Symfony 2 projects",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Henning Glatter-Gotz",
-            "email": "henning@glatter-gotz.com"
+            "name": "Henning Glatter-Götz",
+            "email": "henning@glatter-gotz.com",
+            "homepage": "http://glatter-gotz.com"
         }
     ],
-    "require": {
-    }
     "scripts": {
         "post-install-cmd": [
             "cp fabfile.py ../../../."
