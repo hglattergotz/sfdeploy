@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 # Import the fabtools module by adding it to the beginning of the path
 import sys
+import os
 sys.path[:0] = ["./"]
 print(os.getcwd())
 #sys.exit(0)
