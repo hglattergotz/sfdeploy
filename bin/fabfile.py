@@ -4,6 +4,7 @@ from __future__ import with_statement
 import sys
 sys.path[:0] = ["./"]
 print(os.getcwd())
+#sys.exit(0)
 import config
 import git
 import pear
