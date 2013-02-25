@@ -12,6 +12,9 @@
     "scripts": {
         "post-install-cmd": [
             "cp fabfile.py ../../../."
+        ],
+        "post-update-cmd": [
+            "cp fabfile.py ../../../."
         ]
     }
 }
