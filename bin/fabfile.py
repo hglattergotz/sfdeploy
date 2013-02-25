@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 # Import the fabtools module by adding it to the beginning of the path
 import sys
-#sys.path[:0] = ["lib/fabtools"]
+sys.path[:0] = ["."]
 import config
 import git
 import pear
