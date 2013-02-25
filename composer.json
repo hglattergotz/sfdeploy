@@ -9,5 +9,5 @@
             "homepage": "http://glatter-gotz.com"
         }
     ],
-    "bin": ["bin/fabfile.py"]
+    "bin": ["fabfile.py"]
 }
