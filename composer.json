@@ -9,14 +9,5 @@
             "homepage": "http://glatter-gotz.com"
         }
     ],
-    "scripts": {
-        "post-install-cmd": [
-            "pwd",
-            "cp fabfile.py ../../../."
-        ],
-        "post-update-cmd": [
-            "pwd",
-            "cp fabfile.py ../../../."
-        ]
-    }
+    "bin": ["bin/fabfile.py"]
 }
