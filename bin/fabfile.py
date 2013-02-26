@@ -109,7 +109,8 @@ def get_installed_revision():
 
 
 def sf_permissions():
-    sudo('cd %s && ./symfony project:permissions' % (env.source_dir))
+    print('You might want to do something here')
+    #sudo('cd %s && ./symfony project:permissions' % (env.source_dir))
 
 
 def make_folders():
