@@ -62,9 +62,9 @@ def deploy():
     """
     Deploy to project to target server(s)
     """
-    if git.is_git_dirty():
-        print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
-        exit(1)
+    #if git.is_git_dirty():
+        #print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
+        #exit(1)
 
     if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
                    (git.git_sha1_commit(), env.deployment_target),
