@@ -40,7 +40,6 @@ def which(program):
     return None
 
 
-@task
 def archive_all(archive_path, archive_file_name, ignore = []):
     import tarfile
     params = []
@@ -50,7 +49,10 @@ def archive_all(archive_path, archive_file_name, ignore = []):
     params.append('! -path "*/.git/*"')
     params.append('! -iname "*.pyc"')
     params.append('! -iname ".gitignore"')
-    params.extend(ignore)
+
+    for path in ignore:
+        params.append(''.join('! -path "*', path, '/*"'))
+
     params.append('-print')
     cmd = ' '.join(params)
 

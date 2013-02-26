@@ -24,7 +24,7 @@ from datetime import date, timedelta
 from fabric.contrib.console import confirm
 from fabric.colors import red, green
 import time
-from pprint import pprint
+#from pprint import pprint
 
 
 def load_config():
@@ -35,7 +35,6 @@ def load_config():
     """
     env.update(config.load_yaml_config('app/config/deployment/config.yml',
                env.deployment_target))
-    pprint(env)
 
 @task
 def dev():
@@ -173,7 +172,7 @@ def upload_source(deploy_revision, package_dir, source_dir):
     """
     print(green('Uploading source to target'))
     archive_name = '%s.tar.gz' % (deploy_revision)
-    git.git_archive_all(os.getcwd(), archive_name)
+    shell.archive_all(os.getcwd(), archive_name, env.ignore_on_deploy)
     put('%s' % (archive_name), '%s/'  % (package_dir), True)
     sudo('cd %s && tar zxf %s/%s' % (source_dir, package_dir, archive_name))
     local('rm %s' % archive_name)
