@@ -35,7 +35,7 @@ def load_config():
     """
     env.update(config.load_yaml_config('config/deployment/config.yml',
                env.deployment_target))
-
+    pprint(env)
 
 @task
 def dev():
