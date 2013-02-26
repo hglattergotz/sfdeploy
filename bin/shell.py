@@ -38,3 +38,31 @@ def which(program):
                 return exe_file
 
     return None
+
+
+@task
+def archive_all(archive_path, archive_file_name, ignore = []):
+    import tarfile
+    params = []
+    params.append('find .')
+    params.append('-type f')
+    params.append('! -path "./.git"')
+    params.append('! -path "*/.git/*"')
+    params.append('! -iname "*.pyc"')
+    params.append('! -iname ".gitignore"')
+    params.extend(ignore)
+    params.append('-print')
+    cmd = ' '.join(params)
+
+    files = local(cmd, capture=True).split('\n')
+    cwd = os.getcwd()
+    os.chdir(archive_path)
+    project_tar = tarfile.open(archive_file_name, 'w:gz')
+
+    for filename in files:
+        project_tar.add(filename)
+
+    project_tar.close()
+    os.chdir(cwd)
+
+    print(green('Archive created at %s/%s' % (path, archive_file_name)))
