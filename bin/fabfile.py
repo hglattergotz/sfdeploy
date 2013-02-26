@@ -24,7 +24,7 @@ from datetime import date, timedelta
 from fabric.contrib.console import confirm
 from fabric.colors import red, green
 import time
-
+from pprint import pprint
 
 def load_config():
     """
@@ -34,7 +34,7 @@ def load_config():
     """
     env.update(config.load_yaml_config('app/config/deployment/config.yml',
                env.deployment_target))
-
+    pprint(env);
 
 @task
 def dev():
