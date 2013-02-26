@@ -26,15 +26,16 @@ from fabric.colors import red, green
 import time
 from pprint import pprint
 
+
 def load_config():
     """
     Load the yaml configuration file into the env dictionary.
     This depends on the deployment_target being set and should typically get
     called from either dev() or prod().
     """
-    env.update(config.load_yaml_config('app/config/deployment/config.yml',
+    env.update(config.load_yaml_config('config/deployment/config.yml',
                env.deployment_target))
-    pprint(env);
+
 
 @task
 def dev():
@@ -57,13 +58,13 @@ def prod():
 
 
 @task
-def deploy(skip_cron='n'):
+def deploy():
     """
-    Deploy to project to target server(s), example: fab prod deploy:skip_cron=y/n
+    Deploy to project to target server(s)
     """
-    #if git.is_git_dirty():
-        #print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
-        #exit(1)
+    if git.is_git_dirty():
+        print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
+        exit(1)
 
     if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
                    (git.git_sha1_commit(), env.deployment_target),
@@ -72,19 +73,19 @@ def deploy(skip_cron='n'):
 
     deploy_rev = git.git_sha1_commit()
     set_source_dir(deploy_rev)
+    set_tmp_dir(deploy_rev)
 
     print(green('Deploying revision %s to "%s"' %
           (deploy_rev, env.deployment_target), bold=True))
     make_folders()
-    upload_source(deploy_rev, env.packages_dir, env.source_dir)
+    mkdir(env.source_dir, 755)
+    mkdir('%s/cache' % (env.source_dir), 777)
+    mkdir('%s/log' % (env.source_dir), 777)
+    upload_source(deploy_rev, env.directories['packages']['dir'], env.source_dir)
     sf_permissions()
-
     stop()
     link_folders()
-
-    if (skip_cron == 'n'):
-        start()
-
+    start()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
 
@@ -98,10 +99,6 @@ def installed_rev():
           (env.deployment_target, get_installed_revision())))
 
 
-def sf_permissions():
-    sudo('cd %s && ./symfony project:permissions' % (env.source_dir))
-
-
 def get_installed_revision():
     """
     Not sure if this will work too well anymore until the actual git revision
@@ -112,43 +109,43 @@ def get_installed_revision():
     return parts.pop()
 
 
+def sf_permissions():
+    sudo('cd %s && ./symfony project:permissions' % (env.source_dir))
+
+
 def make_folders():
     """
     Create the folder structure on the deployment target
     """
     print(green('Creating remote folders'))
-    if not exists('%(project_dir)s' % (env)):
-      sudo('mkdir %(project_dir)s' % (env))
 
-    if not exists('%(sources_dir)s' % (env)):
-      sudo('mkdir %(sources_dir)s' % (env))
+    for dir, values in env.directories.iteritems():
+        mkdir(values['dir'], values['perms'])
 
-    if not exists('%(source_dir)s' % (env)):
-      sudo('mkdir %(source_dir)s' % (env))
 
-    if not exists('%(source_dir)s/app/cache' % (env)):
-      sudo('mkdir %(source_dir)s/app/cache' % (env))
-
-    if not exists('%(source_dir)s/app/logs' % (env)):
-      sudo('mkdir %(source_dir)s/app/logs' % (env))
-
-    if not exists('%(packages_dir)s' % (env)):
-      sudo('mkdir %(packages_dir)s' % (env))
+def mkdir(path, mod):
+    if not exists('%s' % (path)):
+        sudo('mkdir %s' % (path))
+        sudo('chmod %s %s' % (mod, path))
 
 
 def set_source_dir(deploy_rev = ''):
     if deploy_rev != '':
-        env.source_dir = "%s/%s" % (env.sources_dir, deploy_rev)
+        env.source_dir = "%s/%s" % (env.directories['sources']['dir'], deploy_rev)
     else:
         env.source_dir = get_current_physical_dir()
 
 
+def set_tmp_dir(deploy_rev):
+    env.tmp_dir = '%s/%s' % (tempfile.gettempdir(), deploy_rev)
+
+
 def get_current_physical_dir():
-    if exists(env.current_dir):
-        return sudo('cd %s && pwd -P' % (env.current_dir))
+    if exists(env.symlinks['current']['path']):
+        return sudo('cd %s && pwd -P' % (env.symlinks['current']['path']))
     else:
-        print(red('Directory %s does not exist.' % env.current_dir, bold=True))
-        raise Exception('Directory env.current_dir does not exist')
+        print(red('Directory %s does not exist.' % env.symlinks['current']['path'], bold=True))
+        raise Exception('Directory %s does not exist' % (env.symlinks['current']['path']))
 
 
 def upload_source(deploy_revision, package_dir, source_dir):
@@ -188,10 +185,10 @@ def link_folders():
     installed package folder.
     """
     print(green('Linking folders', bold=True))
-    if exists(env.current_dir):
-        sudo('rm -rf %s' % (env.current_dir))
+    if exists(env.symlinks['current']['path']):
+        sudo('rm -rf %s' % (env.symlinks['current']['path']))
 
-    sudo('ln -s %s %s' % (env.source_dir, env.current_dir))
+    sudo('ln -s %s %s' % (env.source_dir, env.symlinks['current']['path']))
 
 
 @task
@@ -203,7 +200,7 @@ def start():
     try:
         physical_dir = get_current_physical_dir()
 
-        if env.current_dir != physical_dir:
+        if env.symlinks['current']['path']!= physical_dir:
             cron = load_cron_config()
             for job in cron['cron']['jobs']:
                 install_sf_cron_job(job, cron['cron']['runhour'][env.deployment_target], physical_dir)
@@ -222,7 +219,7 @@ def stop():
     try:
         physical_dir = get_current_physical_dir()
 
-        if env.current_dir != physical_dir:
+        if env.symlinks['current']['path']!= physical_dir:
             cron = load_cron_config()
             with settings(warn_only=True):
                 sudo('rm %s/%s*' % (cron['cron']['cron_dir'], cron['cron']['cron_job_prefix']))
