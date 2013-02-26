@@ -51,7 +51,7 @@ def archive_all(archive_path, archive_file_name, ignore = []):
     params.append('! -iname ".gitignore"')
 
     for path in ignore:
-        params.append(''.join('! -path "*', path, '/*"'))
+        params.append(''.join(['! -path "*', path, '/*"']))
 
     params.append('-print')
     cmd = ' '.join(params)
