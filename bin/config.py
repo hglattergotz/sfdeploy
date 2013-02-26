@@ -38,6 +38,7 @@ def load_yaml(path):
         f.close()
         return data
     else:
+        # This should maybe throw an exception or something
         return {}
 
 

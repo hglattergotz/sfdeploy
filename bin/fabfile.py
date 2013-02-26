@@ -33,7 +33,7 @@ def load_config():
     This depends on the deployment_target being set and should typically get
     called from either dev() or prod().
     """
-    env.update(config.load_yaml_config('config/deployment/config.yml',
+    env.update(config.load_yaml_config('app/config/deployment/config.yml',
                env.deployment_target))
     pprint(env)
 
