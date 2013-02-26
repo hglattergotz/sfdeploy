@@ -1,11 +1,16 @@
+# -*- coding: utf-8 -*-
+# config.py
+#
+# Copyright (c) 2012-2013 Henning Glatter-Götz
+#
+# For the full copyright and license information, please view the LICENSE
+# file that was distributed with this source code.
+
 from __future__ import with_statement
 
-# Import the fabtools module by adding it to the beginning of the path
+# Import the modules by adding it to the beginning of the path
 import sys
-import os
-sys.path[:0] = ["./"]
-print(os.getcwd())
-#sys.exit(0)
+sys.path[:0] = ["vendor/hgg/sfdeploy/bin"]
 import config
 import git
 import pear
@@ -27,7 +32,7 @@ def load_config():
     This depends on the deployment_target being set and should typically get
     called from either dev() or prod().
     """
-    env.update(fabtools.load_yaml_config('config/deployment/config.yml',
+    env.update(config.load_yaml_config('app/config/deployment/config.yml',
                env.deployment_target))
 
 
@@ -56,16 +61,16 @@ def deploy(skip_cron='n'):
     """
     Deploy to project to target server(s), example: fab prod deploy:skip_cron=y/n
     """
-    if fabtools.is_git_dirty():
-        print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
-        exit(1)
+    #if git.is_git_dirty():
+        #print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
+        #exit(1)
 
     if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
-                   (fabtools.git_sha1_commit(), env.deployment_target),
+                   (git.git_sha1_commit(), env.deployment_target),
                    bold=True)):
       return
 
-    deploy_rev = fabtools.git_sha1_commit()
+    deploy_rev = git.git_sha1_commit()
     set_source_dir(deploy_rev)
 
     print(green('Deploying revision %s to "%s"' %
@@ -121,17 +126,14 @@ def make_folders():
     if not exists('%(source_dir)s' % (env)):
       sudo('mkdir %(source_dir)s' % (env))
 
-    if not exists('%(source_dir)s/cache' % (env)):
-      sudo('mkdir %(source_dir)s/cache' % (env))
+    if not exists('%(source_dir)s/app/cache' % (env)):
+      sudo('mkdir %(source_dir)s/app/cache' % (env))
 
-    if not exists('%(source_dir)s/log' % (env)):
-      sudo('mkdir %(source_dir)s/log' % (env))
+    if not exists('%(source_dir)s/app/logs' % (env)):
+      sudo('mkdir %(source_dir)s/app/logs' % (env))
 
     if not exists('%(packages_dir)s' % (env)):
       sudo('mkdir %(packages_dir)s' % (env))
-
-    if not exists('%(reports_dir)s' % (env)):
-      sudo('mkdir %(reports_dir)s' % (env))
 
 
 def set_source_dir(deploy_rev = ''):
@@ -174,7 +176,7 @@ def upload_source(deploy_revision, package_dir, source_dir):
     """
     print(green('Uploading source to target'))
     archive_name = '%s.tar.gz' % (deploy_revision)
-    fabtools.git_archive_all(os.getcwd(), archive_name)
+    git.git_archive_all(os.getcwd(), archive_name)
     put('%s' % (archive_name), '%s/'  % (package_dir), True)
     sudo('cd %s && tar zxf %s/%s' % (source_dir, package_dir, archive_name))
     local('rm %s' % archive_name)
@@ -231,7 +233,7 @@ def stop():
 
 
 def load_cron_config():
-    cron = fabtools.load_yaml('config/deployment/cron.yml')
+    cron = config.load_yaml('config/deployment/cron.yml')
 
     return cron
 
