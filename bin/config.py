@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-# config.py
-#
-# Copyright (c) 2012-2013 Henning Glatter-Götz
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
+"""
+Configuration tasks
 
-# config.py - Collection of configuration tasks for fabric
-#
-# To include it in the fabfile.py add this near the top
-#
-# import sys
-# import config
+This module provides tools to load yaml configuration files.
 
+"""
 import os
 from fabric.api import *
 from fabric.colors import red, green

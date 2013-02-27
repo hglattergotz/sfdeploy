@@ -1,30 +1,24 @@
-# -*- coding: utf-8 -*-
-# config.py
-#
-# Copyright (c) 2012-2013 Henning Glatter-Götz
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
+"""
+Symfony 2 deployment
 
+"""
 from __future__ import with_statement
 
-# Import the modules by adding it to the beginning of the path
+# Add install directory to the beginning of the include path
 import sys
 sys.path[:0] = ["vendor/hgg/sfdeploy/bin"]
+
+from fabric.api import *
+from fabric.contrib.files import *
+from fabric.contrib.console import confirm
+from fabric.colors import red, green
+from datetime import date, timedelta
+import time
 import config
 import git
 import pear
 import shell
 import tools
-
-from fabric.api import *
-from fabric.contrib.files import *
-#from sys import exit
-from datetime import date, timedelta
-from fabric.contrib.console import confirm
-from fabric.colors import red, green
-import time
-#from pprint import pprint
 
 
 def load_config():
@@ -57,13 +51,14 @@ def prod():
 
 
 @task
-def deploy():
+def deploy(force = False):
     """
     Deploy to project to target server(s)
     """
-    #if git.is_git_dirty():
-        #print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
-        #exit(1)
+    if not force:
+        if git.is_git_dirty():
+            print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
+            exit(1)
 
     if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
                    (git.git_sha1_commit(), env.deployment_target),

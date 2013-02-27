@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-# config.py
-#
-# Copyright (c) 2012-2013 Henning Glatter-Götz
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
+"""
+git specific module
 
-# git.py - Collection of git tasks for fabric
-#
-# To include it in the fabfile.py add this near the top
-#
-# import sys
-# import git
+This provides various git related helpers to get information from a git repo
 
+"""
 import os
 from fabric.api import *
 from fabric.colors import red, green

@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-# config.py
-#
-# Copyright (c) 2012-2013 Henning Glatter-Götz
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
+"""
+PEAR task
 
-# pear.py - Collection of pear related tasks for fabric
-#
-# To include it in the fabfile.py add this near the top
-#
-# import sys
-# import pear
+A task to detect whether a specific PEAR package is installed or not
 
+"""
 import os
 from fabric.api import *
 from fabric.colors import red, green

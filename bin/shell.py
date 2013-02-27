@@ -1,18 +1,7 @@
-# -*- coding: utf-8 -*-
-# config.py
-#
-# Copyright (c) 2012-2013 Henning Glatter-Götz
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
+"""
+Shell module
 
-# fabtools.py - Collection of shell tasks for fabric
-#
-# To include it in the fabfile.py add this near the top
-#
-# import sys
-# import shell
-
+"""
 import os
 from fabric.api import *
 from fabric.colors import red, green
@@ -41,6 +30,13 @@ def which(program):
 
 
 def archive_all(archive_path, archive_file_name, ignore = []):
+    """
+    Create a tar archive from a list of files build by the find command.
+    This is a bit messy because it forces the user to manually exclude all
+    undesired paths. An alternative would be to combine some form of
+    git ls-files for the main project and an iterator that does the same for all
+    vendors (This could be a problem if some vendors are not sourced from git).
+    """
     import tarfile
     params = []
     params.append('find .')
