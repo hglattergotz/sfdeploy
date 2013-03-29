@@ -73,8 +73,8 @@ def deploy(force = False):
           (deploy_rev, env.deployment_target), bold=True))
     make_folders()
     mkdir(env.source_dir, 755)
-    mkdir('%s/cache' % (env.source_dir), 777)
-    mkdir('%s/log' % (env.source_dir), 777)
+    mkdir('%s/app/cache' % (env.source_dir), 777)
+    mkdir('%s/app/log' % (env.source_dir), 777)
     upload_source(deploy_rev, env.directories['packages']['dir'], env.source_dir)
     sf_permissions()
     stop()
@@ -166,9 +166,10 @@ def upload_source(deploy_revision, package_dir, source_dir):
       * Unpack it in a versioned release directory
       * Remove the archive on the local system
     """
-    print(green('Uploading source to target'))
+    print(green('Creating source archive'))
     archive_name = '%s.tar.gz' % (deploy_revision)
     shell.archive_all(os.getcwd(), archive_name, env.ignore_on_deploy)
+    print(green('Uploading archive to target'))
     put('%s' % (archive_name), '%s/'  % (package_dir), True)
     sudo('cd %s && tar zxf %s/%s' % (source_dir, package_dir, archive_name))
     local('rm %s' % archive_name)
