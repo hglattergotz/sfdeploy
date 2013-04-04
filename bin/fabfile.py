@@ -60,19 +60,26 @@ def prod():
 
 
 @task
-def deploy(force = False):
+def deploy():
     """
     Deploy to project to target server(s)
     """
-    if not force:
-        if git.is_git_dirty():
-            print(red('Your working copy is dirty! Commit or stash files first and checkout the commit you want to deploy.', bold=True))
+    if git.is_git_dirty():
+        if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True)):
+            return
+
+        if env.deployment_target == 'prod':
+            print(red('Deploying a dirty copy to prod is very naughty and not permitted', bold=True))
             exit(1)
 
-    if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
-                   (git.git_sha1_commit(), env.deployment_target),
-                   bold=True)):
-      return
+        if not confirm(red('You are about to deploy a DIRTY copy to target "%s". Continue?' %
+                       (env.deployment_target), bold=True)):
+            return
+    else:
+        if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
+                       (git.git_sha1_commit(), env.deployment_target),
+                       bold=True)):
+            return
 
     deploy_rev = git.git_sha1_commit()
     set_source_dir(deploy_rev)
