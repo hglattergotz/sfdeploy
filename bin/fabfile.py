@@ -122,8 +122,14 @@ def make_folders():
     Create the folder structure on the deployment target
     """
     print(green('Creating remote folders'))
+    sorted = []
 
     for dir, values in env.directories.iteritems():
+        sorted.append(values)
+
+    sorted.sort(key=operator.itemgetter('order'))
+
+    for values in sorted:
         mkdir(values['dir'], values['perms'])
 
 
