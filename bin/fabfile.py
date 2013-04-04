@@ -6,6 +6,11 @@ from __future__ import with_statement
 
 # Add install directory to the beginning of the include path
 import sys
+from os import path
+
+if os.path.exists("app/config/deployment/custom.py"):
+    sys.path[:0] = ["app/config/deployment"]
+
 sys.path[:0] = ["vendor/hgg/sfdeploy/bin"]
 
 from fabric.api import *
@@ -20,6 +25,10 @@ import pear
 import shell
 import tools
 
+try:
+    import custom
+except ImportError:
+    print(red('Cannot import custom. Any custom fabric task will not be available'))
 
 def load_config():
     """
