@@ -16,14 +16,15 @@
 import os
 from fabric.api import *
 from fabric.colors import red, green
+import pear
 
 @task
 def loc():
     """
     Run phploc on the project
     """
-    if (fabtools.pear_detect('phploc')):
-        local('phploc --exclude plugins --exclude lib/model --exclude lib/form --exclude lib/filter --exclude lib/vendor --exclude web .')
+    if (pear.pear_detect('phploc')):
+        local('phploc --exclude app/cache,app/logs/vendor')
     else:
         print(red('The PEAR package phploc is not installed.', True) + '\nInstall it as follows (first command as root)\n  pear config-set auto_discover 1\n  pear install pear.phpunit.de/phploc')
 
@@ -33,9 +34,9 @@ def messdetector():
     """
     Run messdetector on the project
     """
-    if (fabtools.pear_detect('PHP_PMD')):
+    if (pear.pear_detect('PHP_PMD')):
         with settings(warn_only=True):
-            result = local('phpmd . html codesize,unusedcode,design --reportfile ../messdetector.html --exclude cache,log,lib/model,lib/form,lib/filter,lib/fabtools,plugins,apps/automation/lib/SeminarSync', capture=True)
+            result = local('phpmd . html codesize,unusedcode,design --reportfile ../messdetector.html --exclude app/cache,app/logs,vendor', capture=True)
         if result.return_code == 0 or result.return_code == 2:
             local('open ../messdetector.html');
         else:
@@ -45,12 +46,9 @@ def messdetector():
 
 
 @task
-def ct(sf='n'):
+def ct():
     """
-    Build the ctags file for this project (for vim use). fab ct:sf=y/n
+    Build the ctags file for this project (for vim use)
     """
-    if (sf == 'y'):
-        local("/usr/local/bin/ctags -R --exclude=.svn --tag-relative=yes --PHP-kinds=+cf-v --regex-PHP='/abstract\s+class\s+([^ ]+)/\1/c/' --regex-PHP='/interface\s+([^ ]+)/\1/c/' --regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/' . /usr/local/share/symfony1.4.17/lib")
-    else:
-        local("/usr/local/bin/ctags -R --exclude=.svn --tag-relative=yes --PHP-kinds=+cf-v --regex-PHP='/abstract\s+class\s+([^ ]+)/\1/c/' --regex-PHP='/interface\s+([^ ]+)/\1/c/' --regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/'")
+    local("/usr/local/bin/ctags -R --exclude=.svn --tag-relative=yes --PHP-kinds=+cf-v --regex-PHP='/abstract\s+class\s+([^ ]+)/\1/c/' --regex-PHP='/interface\s+([^ ]+)/\1/c/' --regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/'")
 
