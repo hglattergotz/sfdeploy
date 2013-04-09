@@ -12,8 +12,13 @@ from fabric.colors import red, green
 try:
     import yaml
 except ImportError:
-    if confirm(red('pyYaml module not installed. Install it now?', bold=True)):
-        install_py_yaml()
+    if confirm(red('pyYaml module not installed. Run the following commands to install it?', bold=True)):
+        print(green('  curl -O http://pyyaml.org/download/pyyaml/PyYAML-3.10.tar.gz'))
+        print(green('  tar -xzf PyYAML-3.10.tar.gz'))
+        print(green('  cd PyYAML-3.10'))
+        print(green('  python setup.py install'))
+        print(green('  cd ..'))
+        print(green('  rm -rf PyYAML-3.10.tar.gz PyYAML-3.10'))
         exit(0)
     else:
         exit(1)
@@ -89,12 +94,3 @@ def load_settings(path):
             [s.partition('=') for s in settings])
     # Handle nonexistent or empty settings file
     return {}
-
-
-def install_py_yaml():
-    """
-    Install the pyYaml module
-    """
-    local('curl -O http://pyyaml.org/download/pyyaml/PyYAML-3.10.tar.gz && tar -xzf PyYAML-3.10.tar.gz && cd PyYAML-3.10 && python setup.py install && cd .. && rm -rf PyYAML-3.10.tar.gz PyYAML-3.10')
-
-
