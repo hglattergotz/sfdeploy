@@ -6,6 +6,7 @@ This module provides tools to load yaml configuration files.
 """
 import os
 from fabric.api import *
+from fabric.contrib.console import confirm
 from fabric.colors import red, green
 
 try:
