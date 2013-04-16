@@ -94,6 +94,7 @@ def deploy():
     mkdir('%s/app/cache' % (env.source_dir), 777)
     mkdir('%s/app/logs' % (env.source_dir), 777)
     sf_permissions()
+    post_upload_hook()
     stop()
     link_folders()
     start()
@@ -252,6 +253,14 @@ def load_cron_config():
     cron = config.load_yaml('config/deployment/cron.yml')
 
     return cron
+
+
+def post_upload_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_upload_hook()
+      except AttributeError:
+          print('No post_upload_hook defined')
 
 
 def install_sf_cron_job(job, hour, install_dir):
