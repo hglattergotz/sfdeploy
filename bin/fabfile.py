@@ -98,6 +98,7 @@ def deploy():
     stop()
     link_folders()
     start()
+    cleanup()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
 
@@ -209,6 +210,11 @@ def link_folders():
         sudo('rm -rf %s' % (env.symlinks['current']['path']))
 
     sudo('ln -s %s %s' % (env.source_dir, env.symlinks['current']['path']))
+
+
+def cleanup():
+    sudo('rm -rf %s/app/cache/*' % (env.source_dir))
+    sudo('rm -rf %s/app/logs/*' % (env.source_dir))
 
 
 @task
