@@ -256,7 +256,7 @@ def stop():
 
 
 def load_cron_config():
-    cron = config.load_yaml('config/deployment/cron.yml')
+    cron = config.load_yaml('app/config/deployment/cron.yml')
 
     return cron
 
