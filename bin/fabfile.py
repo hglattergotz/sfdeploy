@@ -276,7 +276,7 @@ def install_sf_cron_job(job, hour, install_dir):
     if env.deployment_target in job['targets']:
         print(green('Installing cron job %s:%s' %
               (job['namespace'], job['name']), bold=True))
-        options = ' '
+        args_opts = ' '
 
         for index, object in enumerate(job['options']):
             if '##cron-hour##' in object:
@@ -284,9 +284,13 @@ def install_sf_cron_job(job, hour, install_dir):
 
         if not '--install' in job['options']:
             job['options'].insert(0, '--install')
-        options = options.join(job['options'])
+
+        ao = job['arguments']
+        ao.extend(job['options'])
+        args_opts = args_opts.join(ao)
+
         cmd = ("%s/symfony %s:%s %s" %
-               (install_dir, job['namespace'], job['name'], options))
+               (install_dir, job['namespace'], job['name'], args_opts))
         sudo(cmd)
     else:
         print(green('Skipped %s:%s' %
