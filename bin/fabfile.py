@@ -289,7 +289,7 @@ def install_sf_cron_job(job, hour, install_dir):
         ao.extend(job['options'])
         args_opts = args_opts.join(ao)
 
-        cmd = ("%s/symfony %s:%s %s" %
+        cmd = ("%s/app/console %s:%s %s" %
                (install_dir, job['namespace'], job['name'], args_opts))
         sudo(cmd)
     else:
