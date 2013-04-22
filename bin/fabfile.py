@@ -293,6 +293,10 @@ def install_sf_cron_job(job, hour, install_dir):
         if not '--install' in job['options']:
             job['options'].insert(0, '--install')
 
+        if env.deployment_target == 'prod':
+            job['options'].insert(0, '--env=prod')
+            job['options'].insert(0, '--no-debug')
+
         ao = job['arguments']
         ao.extend(job['options'])
         args_opts = args_opts.join(ao)
