@@ -65,6 +65,8 @@ def deploy():
     """
     Deploy to project to target server(s)
     """
+    install_cron = False
+
     if git.is_git_dirty():
         if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True)):
             return
@@ -82,6 +84,9 @@ def deploy():
                        bold=True)):
             return
 
+    if confirm(red('Start cron jobs automatically as part of the deployment?'), default=False):
+        install_cron = True
+
     deploy_rev = git.git_sha1_commit()
     set_source_dir(deploy_rev)
     set_tmp_dir(deploy_rev)
@@ -97,7 +102,10 @@ def deploy():
     post_upload_hook()
     stop()
     link_folders()
-    start()
+
+    if (install_cron):
+        start()
+
     cleanup()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
