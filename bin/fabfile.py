@@ -107,6 +107,7 @@ def deploy():
         start()
 
     cleanup()
+    post_cleanup_hook()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
 
@@ -275,6 +276,14 @@ def post_upload_hook():
           custom.post_upload_hook()
       except AttributeError:
           print('No post_upload_hook defined')
+
+
+def post_cleanup_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_cleanup_hook()
+      except AttributeError:
+          print('No post_cleanup_hook defined')
 
 
 def install_sf_cron_job(job, hour, install_dir):
