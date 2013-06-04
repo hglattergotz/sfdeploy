@@ -42,7 +42,7 @@ def messdetector():
         else:
             abort(result)
     else:
-        print(red('The PEAR package phploc is not installed.', True) + '\nInstall it as follows (first command as root)\n  pear config-set auto_discover 1\n  pear install pear.phpunit.de/phploc')
+        print(red('The PEAR package PHP_PMD is not installed.', True) + '\nInstall it as follows (first command as root)\n  pear config-set auto_discover 1\n  pear install pear.phpunit.de/PHP_PMD')
 
 
 @task
