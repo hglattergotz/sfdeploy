@@ -104,7 +104,7 @@ def deploy():
     link_folders()
 
     if (install_cron):
-        start()
+        start(False)
 
     cleanup()
     post_cleanup_hook()
@@ -227,7 +227,7 @@ def cleanup():
 
 
 @task
-def start():
+def start(run_cleanup=True):
     """
     Start all cron jobs
     """
@@ -239,6 +239,9 @@ def start():
             cron = load_cron_config()
             for job in cron['cron']['jobs']:
                 install_sf_cron_job(job, cron['cron']['runhour'][env.deployment_target], physical_dir)
+
+            if run_cleanup == True:
+                cleanup();
         else:
             print(red('No cron jobs to start'))
     except Exception as inst:
