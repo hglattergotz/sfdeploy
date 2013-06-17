@@ -106,7 +106,7 @@ def deploy():
     if (install_cron):
         start(run_cleanup=False)
 
-    cleanup()
+    cleanup(env.source_dir)
     post_cleanup_hook()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
@@ -221,9 +221,9 @@ def link_folders():
     sudo('ln -s %s %s' % (env.source_dir, env.symlinks['current']['path']))
 
 
-def cleanup():
-    sudo('rm -rf %s/app/cache/*' % (env.source_dir))
-    sudo('rm -rf %s/app/logs/*' % (env.source_dir))
+def cleanup(path):
+    sudo('rm -rf %s/app/cache/*' % (path))
+    sudo('rm -rf %s/app/logs/*' % (path))
 
 
 @task
@@ -241,7 +241,7 @@ def start(run_cleanup=True):
                 install_sf_cron_job(job, cron['cron']['runhour'][env.deployment_target], physical_dir)
 
             if run_cleanup:
-                cleanup();
+                cleanup(physical_dir);
         else:
             print(red('No cron jobs to start'))
     except Exception as inst:
