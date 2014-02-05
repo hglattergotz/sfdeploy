@@ -71,11 +71,7 @@ def deploy():
         if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True)):
             return
 
-        if env.deployment_target == 'prod':
-            print(red('Deploying a dirty copy to prod is very naughty and not permitted', bold=True))
-            exit(1)
-
-        if not confirm(red('You are about to deploy a DIRTY copy to target "%s". Continue?' %
+        if not confirm(red('*** WARNING *** You are about to deploy a DIRTY copy to target "%s". This is generally not a good idea! Continue?' %
                        (env.deployment_target), bold=True)):
             return
     else:
@@ -305,9 +301,8 @@ def install_sf_cron_job(job, hour, install_dir):
         if not '--install' in job['options']:
             job['options'].insert(0, '--install')
 
-        if env.deployment_target == 'prod':
-            job['options'].insert(0, '--env=prod')
-            job['options'].insert(0, '--no-debug')
+        job['options'].insert(0, '--env=prod')
+        job['options'].insert(0, '--no-debug')
 
         ao = job['arguments']
         ao.extend(job['options'])
