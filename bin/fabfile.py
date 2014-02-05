@@ -98,12 +98,12 @@ def deploy():
     post_upload_hook()
     stop()
     link_folders()
+    cleanup(env.source_dir)
+    post_cleanup_hook()
 
     if (install_cron):
         start(run_cleanup=False)
 
-    cleanup(env.source_dir)
-    post_cleanup_hook()
     print(green('Successfully deployed revision %s to %s' %
           (deploy_rev, env.deployment_target), bold=True))
 
