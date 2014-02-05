@@ -41,22 +41,12 @@ def load_config():
                env.deployment_target))
 
 @task
-def dev():
+def target(target):
     """
     Set the target to be the development environment and load the configuration
     for that environment.
     """
-    env.deployment_target = 'dev'
-    load_config()
-
-
-@task
-def prod():
-    """
-    Set the target to be the production environment and load the configuration
-    for that environment.
-    """
-    env.deployment_target = 'prod'
+    env.deployment_target = target
     load_config()
 
 
@@ -68,11 +58,11 @@ def deploy():
     install_cron = False
 
     if git.is_git_dirty():
-        if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True)):
+        if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True), default=False):
             return
 
         if not confirm(red('*** WARNING *** You are about to deploy a DIRTY copy to target "%s". This is generally not a good idea! Continue?' %
-                       (env.deployment_target), bold=True)):
+                       (env.deployment_target), bold=True), default=False):
             return
     else:
         if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
