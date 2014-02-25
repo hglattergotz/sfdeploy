@@ -218,6 +218,8 @@ def start(run_cleanup=True):
     Start all cron jobs
     """
     print(green('Starting cron jobs', bold=True))
+    pre_start_hook()
+
     try:
         physical_dir = get_current_physical_dir()
 
@@ -233,6 +235,8 @@ def start(run_cleanup=True):
     except Exception as inst:
         print(red('Cron jobs not started. Exception: %s' % inst, bold=True))
 
+    post_start_hook()
+
 
 @task
 def stop():
@@ -240,6 +244,8 @@ def stop():
     Stop all cron jobs
     """
     print(green('Stopping cron jobs', bold=True))
+    pre_stop_hook()
+
     try:
         physical_dir = get_current_physical_dir()
 
@@ -252,11 +258,45 @@ def stop():
     except Exception as inst:
         print(red('Cron jobs not stopped (There might not be any installed). Exception: %s' % inst, bold=True))
 
+    post_stop_hook()
+
 
 def load_cron_config():
     cron = config.load_yaml('app/config/deployment/cron.yml')
 
     return cron
+
+
+def pre_start_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.pre_start_hook()
+      except AttributeError:
+          print('No pre_start_hook defined')
+
+
+def post_start_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_start_hook()
+      except AttributeError:
+          print('No post_start_hook defined')
+
+
+def pre_stop_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.pre_stop_hook()
+      except AttributeError:
+          print('No pre_stop_hook defined')
+
+
+def post_stop_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_stop_hook()
+      except AttributeError:
+          print('No post_stop_hook defined')
 
 
 def post_upload_hook():
