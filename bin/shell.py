@@ -45,6 +45,7 @@ def archive_all(archive_path, archive_file_name, ignore = []):
     params.append('! -path "*/.git/*"')
     params.append('! -iname "*.pyc"')
     params.append('! -iname ".gitignore"')
+    params.append('! -iname "tags"')
 
     for path in ignore:
         params.append(''.join(['! -path "*', path, '/*"']))

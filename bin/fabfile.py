@@ -41,22 +41,12 @@ def load_config():
                env.deployment_target))
 
 @task
-def dev():
+def target(target):
     """
     Set the target to be the development environment and load the configuration
     for that environment.
     """
-    env.deployment_target = 'dev'
-    load_config()
-
-
-@task
-def prod():
-    """
-    Set the target to be the production environment and load the configuration
-    for that environment.
-    """
-    env.deployment_target = 'prod'
+    env.deployment_target = target
     load_config()
 
 
@@ -68,15 +58,11 @@ def deploy():
     install_cron = False
 
     if git.is_git_dirty():
-        if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True)):
+        if not confirm(red('Your working copy is dirty! You have not committed your code changes. Are you sure you want to continue?', bold=True), default=False):
             return
 
-        if env.deployment_target == 'prod':
-            print(red('Deploying a dirty copy to prod is very naughty and not permitted', bold=True))
-            exit(1)
-
-        if not confirm(red('You are about to deploy a DIRTY copy to target "%s". Continue?' %
-                       (env.deployment_target), bold=True)):
+        if not confirm(red('*** WARNING *** You are about to deploy a DIRTY copy to target "%s". This is generally not a good idea! Continue?' %
+                       (env.deployment_target), bold=True), default=False):
             return
     else:
         if not confirm(red('You are about to deploy the commit "%s" copy to target "%s". Continue?' %
@@ -240,6 +226,8 @@ def start(run_cleanup=True):
     Start all cron jobs
     """
     print(green('Starting cron jobs', bold=True))
+    pre_start_hook()
+
     try:
         physical_dir = get_current_physical_dir()
 
@@ -255,6 +243,8 @@ def start(run_cleanup=True):
     except Exception as inst:
         print(red('Cron jobs not started. Exception: %s' % inst, bold=True))
 
+    post_start_hook()
+
 
 @task
 def stop():
@@ -262,6 +252,8 @@ def stop():
     Stop all cron jobs
     """
     print(green('Stopping cron jobs', bold=True))
+    pre_stop_hook()
+
     try:
         physical_dir = get_current_physical_dir()
 
@@ -274,11 +266,45 @@ def stop():
     except Exception as inst:
         print(red('Cron jobs not stopped (There might not be any installed). Exception: %s' % inst, bold=True))
 
+    post_stop_hook()
+
 
 def load_cron_config():
     cron = config.load_yaml('app/config/deployment/cron.yml')
 
     return cron
+
+
+def pre_start_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.pre_start_hook()
+      except AttributeError:
+          print('No pre_start_hook defined')
+
+
+def post_start_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_start_hook()
+      except AttributeError:
+          print('No post_start_hook defined')
+
+
+def pre_stop_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.pre_stop_hook()
+      except AttributeError:
+          print('No pre_stop_hook defined')
+
+
+def post_stop_hook():
+    if ('custom' in sys.modules):
+      try:
+          custom.post_stop_hook()
+      except AttributeError:
+          print('No post_stop_hook defined')
 
 
 def post_upload_hook():
@@ -313,9 +339,8 @@ def install_sf_cron_job(job, hour, install_dir):
         if not '--install' in job['options']:
             job['options'].insert(0, '--install')
 
-        if env.deployment_target == 'prod':
-            job['options'].insert(0, '--env=prod')
-            job['options'].insert(0, '--no-debug')
+        job['options'].insert(0, '--env=prod')
+        job['options'].insert(0, '--no-debug')
 
         ao = job['arguments']
         ao.extend(job['options'])
