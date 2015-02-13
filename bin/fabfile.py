@@ -88,6 +88,7 @@ def deploy():
         install_cron = True
 
     deploy_rev = git.git_sha1_commit()
+    set_deploy_rev(deploy_rev)
     set_source_dir(deploy_rev)
     set_tmp_dir(deploy_rev)
 
@@ -156,6 +157,13 @@ def mkdir(path, mod):
     if not exists('%s' % (path)):
         sudo('mkdir %s' % (path))
         sudo('chmod %s %s' % (mod, path))
+
+
+def set_deploy_rev(deploy_rev = ''):
+    if deploy_rev != '':
+        env.deploy_rev = deploy_rev
+    else:
+        env.deploy_rev = 'unknown'
 
 
 def set_source_dir(deploy_rev = ''):
